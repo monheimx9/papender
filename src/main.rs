@@ -19,13 +19,17 @@ fn main() {
         }
         None => println!("No images to concat"),
     }
-    if opts.no_resize {
-        imgs.push(image::open(opts.input.unwrap()).unwrap());
-    } else {
-        let rescaled = imgproc::scale_image(opts.input.unwrap(), new_y);
-        imgs.push(image::open(rescaled).unwrap());
-    }
+    let image_last = {
+        if opts.no_resize {
+            image::open(opts.input.unwrap()).unwrap()
+        } else {
+            let rescaled = imgproc::scale_image(opts.input.unwrap(), new_y);
+            image::open(rescaled).unwrap()
+        }
+    };
     let result_path = &opts.output.unwrap();
 
-    imgproc::h_concat_vec(imgs).save(result_path).unwrap();
+    imgproc::h_concat_vec(imgs, image_last, opts.hue.unwrap())
+        .save(result_path)
+        .unwrap();
 }

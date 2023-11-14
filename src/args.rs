@@ -9,6 +9,7 @@ pub struct LesOptions {
     pub output: Option<String>,
     pub no_resize: bool,
     pub resize: Option<u32>,
+    pub hue: Option<i32>,
     pub flagos: Option<Vec<String>>,
 }
 
@@ -84,6 +85,12 @@ fn arg_parser_clap() -> LesOptions {
                 .short('f')
                 .help("Pictures to be concatened, see cfg.json"),
         )
+        .arg(
+            Arg::new("hue")
+                .short('H')
+                .default_value("0")
+                .help("Hue rotation value in degrees"),
+        )
         .get_matches();
     let les_options = LesOptions {
         input: match_result
@@ -93,7 +100,22 @@ fn arg_parser_clap() -> LesOptions {
             .get_one::<String>("output")
             .map(|s| s.to_string()),
         no_resize: match_result.get_flag("no-resize"),
-        resize: match_result.get_one::<u32>("resize").copied(),
+        resize: {
+            let tempy = match_result
+                .get_one::<String>("resize")
+                .map(|s| s.to_string())
+                .unwrap();
+            let tempy2: Option<u32> = Some(tempy.parse().unwrap());
+            tempy2
+        },
+        hue: {
+            let h = match_result
+                .get_one::<String>("hue")
+                .map(|s| s.to_string())
+                .unwrap();
+            let h: i32 = h.parse().unwrap();
+            Some(h)
+        },
         flagos: {
             match match_result.get_one::<String>("flags") {
                 Some(a) => parse_flags(a),
