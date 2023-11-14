@@ -10,6 +10,7 @@ mod imgproc;
 fn main() {
     let opts = args::config_load();
     let mut imgs = Vec::new();
+    let new_y: u32 = opts.resize.unwrap();
     match opts.flagos {
         Some(flags) => {
             for img in flags {
@@ -21,7 +22,7 @@ fn main() {
     if opts.no_resize {
         imgs.push(image::open(opts.input.unwrap()).unwrap());
     } else {
-        let rescaled = imgproc::scale_image(opts.input.unwrap(), 400);
+        let rescaled = imgproc::scale_image(opts.input.unwrap(), new_y);
         imgs.push(image::open(rescaled).unwrap());
     }
     let result_path = &opts.output.unwrap();

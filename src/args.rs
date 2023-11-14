@@ -1,14 +1,14 @@
 use clap::{command, Arg, ArgAction, ArgMatches};
 use config::{Config, File};
 use std::collections::HashMap;
+use std::env;
 use std::path::Path;
-use std::{env, u16};
 
 pub struct LesOptions {
     pub input: Option<String>,
     pub output: Option<String>,
     pub no_resize: bool,
-    pub resize: Option<u16>,
+    pub resize: Option<u32>,
     pub flagos: Option<Vec<String>>,
 }
 
@@ -75,6 +75,7 @@ fn arg_parser_clap() -> LesOptions {
         .arg(
             Arg::new("resize")
                 .conflicts_with("no-resize")
+                .default_value("400")
                 .short('r')
                 .help("Set the resize height value only in pixels"),
         )
@@ -92,7 +93,7 @@ fn arg_parser_clap() -> LesOptions {
             .get_one::<String>("output")
             .map(|s| s.to_string()),
         no_resize: match_result.get_flag("no-resize"),
-        resize: match_result.get_one::<u16>("resize").copied(),
+        resize: match_result.get_one::<u32>("resize").copied(),
         flagos: {
             match match_result.get_one::<String>("flags") {
                 Some(a) => parse_flags(a),
