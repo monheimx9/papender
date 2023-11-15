@@ -1,9 +1,9 @@
-use image::imageops::colorops::huerotate_in_place;
+use crate::LesFiltres;
+use image::imageops::colorops::{grayscale_alpha, huerotate, huerotate_in_place, invert};
 use image::imageops::FilterType;
 use image::{GenericImage, GenericImageView, ImageBuffer, ImageFormat, Pixel, Primitive};
 use std::fs::File;
-
-pub fn h_concat_vec<I, P, S>(images: Vec<I>, image_last: I, hue: i32) -> ImageBuffer<P, Vec<S>>
+pub fn h_concat_vec<I, P, S>(images: Vec<I>, image_last: I, f: LesFiltres) -> ImageBuffer<P, Vec<S>>
 where
     I: GenericImageView<Pixel = P> + image::GenericImage,
     P: Pixel<Subpixel = S> + 'static,
@@ -19,9 +19,11 @@ where
 
     for mut img in images {
         let y = img_height_out - img.height();
-        huerotate_in_place(&mut img, hue);
+        let x = img.width();
+        apply_filter(&mut img, &f);
+        // huerotate_in_place(&mut img, f.hue.unwrap());
         imgbuf.copy_from(&img, accumulated_width, y).unwrap();
-        accumulated_width += img.width();
+        accumulated_width += x;
     }
     imgbuf
         .copy_from(
@@ -32,6 +34,22 @@ where
         .unwrap();
 
     imgbuf
+}
+
+fn apply_filter<I>(img: &mut I, f: &LesFiltres)
+where
+    I: GenericImage,
+{
+    match f.hue {
+        Some(a) => huerotate_in_place(img, a),
+        None => huerotate_in_place(img, 0),
+    };
+    // if f.gray {
+    //     grayscale_alpha(&mut img)
+    // };
+    if f.invert {
+        invert(img)
+    };
 }
 
 pub fn scale_image(img: String, new_y: u32) -> String {
