@@ -2,9 +2,13 @@
   "st": "./sciesurtable.png",
   "ss": "./sciesol.png",
   "ea": "./eau.png",
+  "se": "./sanseau.png",
   "me": "./meuleuse.png",
   "pe": "./perceuse.png",
   "ra": "./rainureuse.png",
   "ta": "./scieatable.png",
-  "di": "./disqueuse.png"
+  "di": "./disqueuse.png",
+  "su": "./surfaceuse.png",
+  "fo": "./foreuse.png",
+  "de": "./deporte.png"
 }
