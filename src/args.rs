@@ -1,3 +1,4 @@
+use crate::LesFiltres;
 use clap::{command, Arg, ArgAction, ArgMatches};
 use config::{Config, File};
 use std::collections::HashMap;
@@ -9,8 +10,8 @@ pub struct LesOptions {
     pub output: Option<String>,
     pub no_resize: bool,
     pub resize: Option<u32>,
-    pub hue: Option<i32>,
     pub flagos: Option<Vec<String>>,
+    pub les_filtres: LesFiltres,
 }
 
 pub fn config_load() -> LesOptions {
@@ -91,39 +92,70 @@ fn arg_parser_clap() -> LesOptions {
                 .default_value("0")
                 .help("Hue rotation value in degrees"),
         )
+        .arg(
+            Arg::new("contrast")
+                .short('C')
+                .help("Set new contrast to the image in positive or negative floating point value"),
+        )
+        .arg(
+            Arg::new("gray-scale")
+                .short('G')
+                .action(ArgAction::SetTrue)
+                .help("Turn the image to a gray-scale"),
+        )
+        .arg(
+            Arg::new("invert")
+                .short('I')
+                .action(ArgAction::SetTrue)
+                .help("Invert colors of every pixels"),
+        )
         .get_matches();
-    let les_options = LesOptions {
-        input: match_result
-            .get_one::<String>("input")
-            .map(|s| s.to_string()),
-        output: match_result
-            .get_one::<String>("output")
-            .map(|s| s.to_string()),
-        no_resize: match_result.get_flag("no-resize"),
+    build_options(match_result)
+}
+
+fn build_options(o: ArgMatches) -> LesOptions {
+    LesOptions {
+        input: o.get_one::<String>("input").map(|s| s.to_string()),
+        output: o.get_one::<String>("output").map(|s| s.to_string()),
+        no_resize: o.get_flag("no-resize"),
         resize: {
-            let tempy = match_result
+            let s = o
                 .get_one::<String>("resize")
                 .map(|s| s.to_string())
                 .unwrap();
-            let tempy2: Option<u32> = Some(tempy.parse().unwrap());
-            tempy2
-        },
-        hue: {
-            let h = match_result
-                .get_one::<String>("hue")
-                .map(|s| s.to_string())
-                .unwrap();
-            let h: i32 = h.parse().unwrap();
-            Some(h)
+            let i: u32 = s.parse().unwrap();
+            Some(i)
         },
         flagos: {
-            match match_result.get_one::<String>("flags") {
+            match o.get_one::<String>("flags") {
                 Some(a) => parse_flags(a),
                 None => None,
             }
         },
-    };
-    les_options
+
+        les_filtres: LesFiltres {
+            hue: {
+                match o.get_one::<String>("hue").map(|s| s.to_string()) {
+                    Some(a) => {
+                        let b: i32 = a.parse().unwrap();
+                        Some(b)
+                    }
+                    None => None,
+                }
+            },
+            contrasty: {
+                match o.get_one::<String>("contrast").map(|s| s.to_string()) {
+                    Some(a) => {
+                        let b: f32 = a.parse().unwrap();
+                        Some(b)
+                    }
+                    None => None,
+                }
+            },
+            gray: o.get_flag("gray-scale"),
+            invert: o.get_flag("invert"),
+        },
+    }
 }
 
 fn parse_flags(commands: &str) -> Option<Vec<String>> {

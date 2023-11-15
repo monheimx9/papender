@@ -7,6 +7,14 @@ mod imgproc;
 ///
 /// Run from the root of the repository with:
 /// cargo run --release --example concat
+
+pub struct LesFiltres {
+    pub hue: Option<i32>,
+    pub contrasty: Option<f32>,
+    pub gray: bool,
+    pub invert: bool,
+}
+
 fn main() {
     let opts = args::config_load();
     let mut imgs = Vec::new();
@@ -29,7 +37,7 @@ fn main() {
     };
     let result_path = &opts.output.unwrap();
 
-    imgproc::h_concat_vec(imgs, image_last, opts.hue.unwrap())
+    imgproc::h_concat_vec(imgs, image_last, opts.les_filtres)
         .save(result_path)
         .unwrap();
 }
