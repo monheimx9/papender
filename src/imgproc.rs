@@ -1,5 +1,7 @@
 use crate::LesFiltres;
-use image::imageops::colorops::{grayscale_alpha, huerotate, huerotate_in_place, invert};
+use image::imageops::colorops::{
+    contrast_in_place, grayscale_with_type_alpha, huerotate_in_place, invert,
+};
 use image::imageops::FilterType;
 use image::{GenericImage, GenericImageView, ImageBuffer, ImageFormat, Pixel, Primitive};
 use std::fs::File;
@@ -40,15 +42,20 @@ fn apply_filter<I>(img: &mut I, f: &LesFiltres)
 where
     I: GenericImage,
 {
+    match f.contrasty {
+        Some(a) => contrast_in_place(img, a),
+        None => huerotate_in_place(img, 0),
+    };
     match f.hue {
         Some(a) => huerotate_in_place(img, a),
         None => huerotate_in_place(img, 0),
     };
+
     // if f.gray {
-    //     grayscale_alpha(&mut img)
+    //     grayscale_with_type_alpha(img);
     // };
     if f.invert {
-        invert(img)
+        invert(img);
     };
 }
 

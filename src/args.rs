@@ -95,6 +95,7 @@ fn arg_parser_clap() -> LesOptions {
         .arg(
             Arg::new("contrast")
                 .short('C')
+                .allow_negative_numbers(true)
                 .help("Set new contrast to the image in positive or negative floating point value"),
         )
         .arg(
