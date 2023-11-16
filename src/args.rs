@@ -5,6 +5,7 @@ use std::collections::HashMap;
 use std::env;
 use std::path::Path;
 
+#[derive(Clone)]
 pub struct LesOptions {
     pub input: Option<String>,
     pub output: Option<String>,
@@ -14,13 +15,21 @@ pub struct LesOptions {
     pub les_filtres: LesFiltres,
 }
 
-pub fn config_load() -> LesOptions {
+enum LeDomain {
+    Beton,
+    Granit,
+    Asphalt,
+    Mixte,
+    Carrelage,
+    Metal,
+    Special,
+}
+
+pub fn config_load() -> Result<LesOptions, Box<dyn std::error::Error>> {
     let settings = Config::builder()
         .add_source(File::from(Path::new("./cfg.json")))
-        .build()
-        .unwrap()
-        .try_deserialize::<HashMap<String, String>>()
-        .unwrap();
+        .build()?
+        .try_deserialize::<HashMap<String, String>>()?;
     println!("\n{:?} ", &settings);
     {
         for (setty, villy) in &settings {
@@ -29,13 +38,13 @@ pub fn config_load() -> LesOptions {
         }
     }
     let les_options = arg_parser_clap();
-    LesOptions {
+    Ok(LesOptions {
         flagos: match les_options.flagos {
             Some(a) => parse_flagos(a, settings),
             None => None,
         },
         ..les_options
-    }
+    })
 }
 
 fn parse_flagos(
