@@ -7,8 +7,8 @@ use std::path::Path;
 
 #[derive(Clone)]
 pub struct LesOptions {
-    pub input: Option<String>,
-    pub output: Option<String>,
+    pub input: String,
+    pub output: String,
     pub no_resize: bool,
     pub resize: Option<u32>,
     pub flagos: Option<Vec<String>>,
@@ -125,8 +125,11 @@ fn arg_parser_clap() -> LesOptions {
 
 fn build_options(o: ArgMatches) -> LesOptions {
     LesOptions {
-        input: o.get_one::<String>("input").map(|s| s.to_string()),
-        output: o.get_one::<String>("output").map(|s| s.to_string()),
+        input: o.get_one::<String>("input").map(|s| s.to_string()).unwrap(),
+        output: o
+            .get_one::<String>("output")
+            .map(|s| s.to_string())
+            .unwrap(),
         no_resize: o.get_flag("no-resize"),
         resize: {
             let s = o

@@ -57,18 +57,18 @@ where
     };
 }
 
-pub fn scale_image(img: String, new_y: &u32) -> String {
+pub fn scale_image(img: &str, new_y: u32) -> String {
     let file_name = "new_input.png";
-    let img_view = image::open(&img).unwrap();
+    let img_view = image::open(img).unwrap();
     let x: u32 = img_view.width();
     let y: u32 = img_view.height();
-    if &y != new_y {
+    if y != new_y {
         let new_x: u32 = (x / y) * new_y;
-        let scaled = img_view.resize(new_x, new_y.clone(), FilterType::Triangle);
+        let scaled = img_view.resize(new_x, new_y, FilterType::Triangle);
         let mut output = File::create(file_name).unwrap();
         scaled.write_to(&mut output, ImageFormat::Png).unwrap();
         file_name.to_string()
     } else {
-        img
+        img.to_owned()
     }
 }
