@@ -4,28 +4,28 @@ use config::{Config, File};
 use std::collections::HashMap;
 use std::env;
 use std::path::Path;
-
+use anyhow::*;
 #[derive(Clone)]
 pub struct LesOptions {
-    pub input: String,
-    pub output: String,
+    pub input: Option<String>,
+    pub output: Option<String>,
     pub no_resize: bool,
     pub resize: Option<u32>,
     pub flagos: Option<Vec<String>>,
     pub les_filtres: LesFiltres,
 }
 
-enum LeDomain {
-    Beton,
-    Granit,
-    Asphalt,
-    Mixte,
-    Carrelage,
-    Metal,
-    Special,
-}
+//enum LeDomain {
+  //  Beton,
+    //Granit,
+    //Asphalt,
+    //Mixte,
+    //Carrelage,
+    //Metal,
+    //Special,
+//}
 
-pub fn config_load() -> Result<LesOptions, Box<dyn std::error::Error>> {
+pub fn config_load() -> Result<LesOptions> {
     let settings = Config::builder()
         .add_source(File::from(Path::new("./cfg.json")))
         .build()?
@@ -125,11 +125,8 @@ fn arg_parser_clap() -> LesOptions {
 
 fn build_options(o: ArgMatches) -> LesOptions {
     LesOptions {
-        input: o.get_one::<String>("input").map(|s| s.to_string()).unwrap(),
-        output: o
-            .get_one::<String>("output")
-            .map(|s| s.to_string())
-            .unwrap(),
+        input: o.get_one::<String>("input").map(|s| s.to_string()),
+        output: o.get_one::<String>("output").map(|s| s.to_string()),
         no_resize: o.get_flag("no-resize"),
         resize: {
             let s = o
